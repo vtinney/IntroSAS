@@ -1,0 +1,59 @@
+* codebook 
+x1 = pt code 
+x2 = surgery date 
+x3 = age in years 
+x4 = gender 1-male 2 -female 
+x5 = height in inches 
+x6 = weight in pounds 
+x7 = surgery duration in minutes 
+x8 = group 1 to 5 
+x9 = total volume injected in ml 
+x10 = R knee pain in VAS score (0-10) 
+x11 = R back pain in VAS score (0-10) 
+x12 = H knee pain? 1 yes 2 No 
+x13 = H back pain in VAS score (0-10); 
+ 
+ 
+DATA b; 
+	INFILE '/folders/myfolders/PAIN.DAT'; 
+	input x1 x2 $ x3-x13; 
+	 
+*Question 3a - generate maxback variable; 
+	maxback = max(x11,x13); 
+ 
+*Question 3b - generate bpain variable; 
+	bpain = maxback; 
+	if maxback = 0 then bpain = 0; 
+	else if maxback = >0 then bpain = 1; 
+ 
+* Question1 - descriptive statistics for: group (x8); 
+	proc freq; 
+	tables x8; 
+	run; 
+	 
+* Question1 - descriptive statistics for: age (x3); 
+	proc means; 
+	var x3; 
+	run; 
+	 
+* Question 2 - descriptive statistics for variables by CLASS: age (x3) by group (x8); 
+	proc means; 
+	var x3; 
+	class x8; 
+	run; 
+ 
+* Question 4 - descriptive statistics for variables by CLASS: bpain by group (x8); 
+	proc freq; 
+	tables bpain x8; 
+	run; 
+	 
+	proc means; 
+	var bpain; 
+	class x8; 
+	run; 
+	 
+* Question 5 - bpain by group 5% significance level; 
+ 	proc freq; 
+	tables bpain*x8/chisq; 
+	run; 
+	 
