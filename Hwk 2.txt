@@ -1,0 +1,56 @@
+* Filename: pain_SLR_HWKVTinney.SAS
+* Objectives:
+*    1. Plot weight vs age
+*    2. Do linear regression analysis: Y (weight, x6) depends on age (x3)
+*    3. Plot studentized residual values versus Y hat
+*      with a horizontal line drawn on the plot
+*      at the specified value on the vertical axis
+*    4. Draw a normal probability plot
+*      for studentized residuals
+*    5. Obtain correlation coefficient between weight and age
+;
+options nodate nocenter;
+DATA pain;
+     INFILE '/folders/myfolders/PAIN.DAT';
+     INPUT x1 x2 $ x3-x5 y x7-x13;
+LABEL x1= 'Patient'
+     x2= 'Surgeon date'
+     x3= 'Age in yrs'
+     x4= 'Sex'
+     x5='height'
+     y='weight'
+     x7='Surg duration'
+     x8='group'
+     x9='total volume'
+     x10='R.knee pain'
+     x11='R.back pain'
+     x12='H.knee pain?'
+     x13='H.back pain'
+;
+*Draw a scatter diagram of Y versus X;
+PROC PLOT;
+     PLOT y*x5;
+     run;
+     
+*run linear regression: Y on X;
+PROC REG;
+     MODEL y=x5 /R;
+     ID x1;
+     OUTPUT OUT=new 
+     P=predict R=residual STUDENT=sturesid;
+     run;
+     
+*Plot of studentized residuals (ri) vs   Y hat;
+PROC PLOT DATA=new;
+     PLOT sturesid*predict /VREF=0;
+     run;
+     
+*Draw a normal probability plot;
+PROC UNIVARIATE PLOT NORMAL;
+     VAR sturesid;
+	 run;
+*Find Pearson's correlation coefficient between Y and X;
+PROC CORR DATA=pain;
+	VAR x5;
+	WITH y;
+	run;
