@@ -1,0 +1,36 @@
+* codebook
+x1 = pt code
+x2 = surgery date
+x3 = age in years
+x4 = gender 1-male 2 -female
+x5 = height in inches
+x6 = weight in pounds
+x7 = surgery duration in minutes
+x8 = group 1 to 5
+x9 = total volume injected in ml
+x10 = R knee pain in VAS score (0-10)
+x11 = R back pain in VAS score (0-10)
+x12 = H knee pain? 1 yes 2 No
+x13 = H back pain in VAS score (0-10);
+
+
+DATA b;
+	INFILE '/folders/myfolders/PAIN.DAT';
+	input x1 x2 $ x3-x13;
+	
+	maxback = max(x11,x13);
+	if x8 = 3 then group = 0;
+	if x8 = 4 then group = 1;
+run;
+
+*T-test (parametric);
+	proc ttest;
+	class group;
+	var maxback;
+	run;
+	
+*Ranksum (non-parametric);
+	proc npar1way WILCOXON;
+     class group;
+     var maxback;
+	run;
